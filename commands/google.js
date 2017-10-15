@@ -24,10 +24,10 @@ class Google extends Command {
       let googleData = $('.r').first().find('a').first().attr('href');
       googleData = querystring.parse(googleData.replace('/url?', ''));
       searchMessage.edit(`Result found!\n${googleData.q}`);
-    }).catch((err) => {
+    }).catch((err) => { // eslint-disable-line no-unused-vars
       searchMessage.edit('No results found.');
-        })
-    }
+    });
+  };
 }
 
 module.exports = Google;
