@@ -44,7 +44,7 @@ class Reminder extends Command {
       reminderTimestamp: message.createdTimestamp + ms(blah.split('#')[1])
     });
 
-    message.channel.send(`I will remind you to \`${blah.split('#')[0]}\`, ${blah.split('#')[1]} from now.`);
+    message.channel.send(`I've created a reminder with the ID ${message.createdTimestamp + ms(blah.split('#')[1])}, to \`${blah.split('#')[0]}\`, ${blah.split('#')[1]} from now.`);
   }
 }
 
