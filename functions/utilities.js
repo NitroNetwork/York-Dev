@@ -1,4 +1,50 @@
+const moment = require('moment');
+require('moment-duration-format');
 module.exports = (client) => {
+
+  client.ratelimit = async (message, level, key, duration) => {
+    if (level > 1) return false;
+    //need the message var from message event
+    //key: the command run
+    //duration of the ratelimit. IE command with 3 secs cooldown would have 3000 set as the duration
+    
+    duration = duration * 1000;
+    const ratelimits = client.ratelimits.get(message.author.id) || {}; //get the ENMAP first.
+    if (!ratelimits[key]) ratelimits[key] = Date.now() - duration; //see if the command has been run before if not, add the ratelimit
+    const differnce = Date.now() - ratelimits[key]; //easier to see the difference
+    if (differnce < duration) { //check the if the duration the command was run, is more than the cooldown
+      return moment.duration(duration - differnce).format('D [days], H [hours], m [minutes], s [seconds]', 1); //returns a string to send to a channel
+    } else {
+      ratelimits[key] = Date.now(); //set the key to now, to mark the start of the cooldown
+      client.ratelimits.set(message.author.id, ratelimits); //set it
+      return true;
+    }
+  };
+
+
+  client.getSettings = (id) => {
+    const defaults = client.settings.get('default');
+    let guild = client.settings.get(id);
+    if (typeof guild != 'object') guild = {};
+    const returnObject = {};
+    Object.keys(defaults).forEach((key) => {
+      returnObject[key] = guild[key] ? guild[key] : defaults[key];
+    });
+    return returnObject;
+  };
+  
+  client.writeSettings = (id, newSettings) => {
+    const defaults = client.settings.get('default');
+    let settings = client.settings.get(id);
+    if (typeof settings != 'object') settings = {};
+    for (const key in newSettings) {
+      if (defaults[key] !== newSettings[key])  {
+        settings[key] = newSettings[key];
+      }
+    }
+    client.settings.set(id, settings);
+  };
+
   client.supportMsg = (message, msg) => {
     const { RichEmbed } = require('discord.js');
     const embed = new RichEmbed()
@@ -87,6 +133,10 @@ module.exports = (client) => {
     return this.replace(/([^\W_]+[^\s-]*) */g, function(txt) {
       return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
+  };
+
+  String.prototype.toPlural = function() {
+    return this.replace(/((?:\D|^)1 .+?)s/g, '$1');
   };
 
   Array.prototype.remove = function() {

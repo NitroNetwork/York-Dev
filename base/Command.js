@@ -6,11 +6,13 @@ class Command {
     usage = 'No usage provided.',
     extended = 'No information provided.',
     cost = 0,
+    cooldown = 0,
     hidden = false,
     guildOnly = false,
     aliases = [],
     botPerms = [],
-    permLevel = 'User'
+    permLevel = 'User',
+    location = ''
   }) {
     this.client = client;
     this.conf = {
@@ -18,7 +20,9 @@ class Command {
       guildOnly,
       aliases,
       botPerms,
-      permLevel
+      permLevel,
+      location,
+      cooldown
     };
     this.help = {
       name,
@@ -36,7 +40,7 @@ class Command {
       if (!match) throw 'Invalid user';
       const id = match[1];
       const check = await this.client.fetchUser(id);
-      if (check.username !== undefined) return id;
+      if (check.username !== undefined) return check;
     } catch (error) {
       throw error;
     }
@@ -70,6 +74,9 @@ class Command {
     } catch (error) {
       throw error;
     }
+  }
+  async run(message, args, level) { // eslint-disable-line no-unused-vars
+    throw new Error(`Command ${this.constructor.name} doesn't provide a run method.`); 
   }
 }
 module.exports = Command;

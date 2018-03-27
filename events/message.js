@@ -11,8 +11,8 @@ module.exports = class {
     const blacklist = this.client.blacklist.get('list');
     if (blacklist.includes(message.author.id)) return;
   
-    const defaults = this.client.config.defaultSettings;
-    const settings = message.guild ? this.client.settings.get(message.guild.id) : defaults;
+    const defaults = this.client.settings.get('default');
+    const settings = message.guild ? this.client.getSettings(message.guild.id) : defaults;
     message.settings = settings;
     
     const level = this.client.permlevel(message);
@@ -40,12 +40,22 @@ module.exports = class {
     const args = message.content.slice(prefix.length).trim().split(/ +/g);
     const command = args.shift().toLowerCase();
     const cmd = this.client.commands.get(command) || this.client.commands.get(this.client.aliases.get(command));
-
+    
+    
     if (this.client.tags.has(command)) {
       return message.channel.send(`${args.join(' ')} ${this.client.tags.get(command).contents}`);
     }
-
+    
     if (!cmd) return;
+    
+    const rateLimit = await this.client.ratelimit(message, level, cmd.help.name, cmd.conf.cooldown); 
+    //message is passed
+    //The key will be the command name
+    //cooldown would be the cooldown, willl be set per command.
+    if (typeof rateLimit == 'string') { //see if the returned is a string
+      this.client.log('log', `${this.client.config.permLevels.find(l => l.level === level).name} ${message.author.username} (${message.author.id}) got ratelimited while running command ${cmd.help.name}`, 'CMD');
+      return message.channel.send(`Please wait ${rateLimit.toPlural()} to run this command.`); //return stop command from executing
+    }
 
     if (cmd && !message.guild && cmd.conf.guildOnly)
       return message.channel.send('This command is unavailable via private message. Please run this command in a guild.');

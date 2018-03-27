@@ -3,7 +3,7 @@
 	Yes, this is a modified version of Auto by Hackzilla
 
 */
-const issue = require('../assets/issueList.json');
+const issue = require('../assets/json/issueList.json');
 function parse(input) {
   if (input.includes('Block-scoped declarations (let, const, function, class) not yet supported outside strict mode')) {
     return {
@@ -102,6 +102,24 @@ function parse(input) {
       info: issue.responses.ffmpeg.info,
       problem: issue.responses.ffmpeg.problem,
       solution: issue.responses.ffmpeg.solution,
+    };
+  } else
+
+  if (input.includes('defaultChannel.send') && input.includes("TypeError: Cannot read property 'send' of undefined")) { // eslint-disable-line quotes
+    return {
+      message: issue.responses.defaultchannel.message,
+      info: issue.responses.defaultchannel.info,
+      problem: issue.responses.defaultchannel.problem,
+      solution: issue.responses.defaultchannel.solution,
+    };
+  } else
+
+  if (input.includes('unmet peer dependencies')) { // eslint-disable-line quotes
+    return {
+      message: issue.responses.unmetdeps.message,
+      info: issue.responses.unmetdeps.info,
+      problem: issue.responses.unmetdeps.problem,
+      solution: issue.responses.unmetdeps.solution,
     };
   }
 
